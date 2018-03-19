@@ -10,12 +10,12 @@ import (
     "log"
 )
 
-const minBits = 18
+const minBits = 24
 const maxNonce = math.MaxInt64
 
 type ProofOfWork struct {
     block *Block
-    goal *big.Int
+    goal  *big.Int
 }
 
 func NewProofOfWork(block *Block) *ProofOfWork {
@@ -33,7 +33,7 @@ func (proofOfWork *ProofOfWork) OrganizeData(nonce int) []byte {
         IntToHex(proofOfWork.block.Timestamp),
         IntToHex(int64(minBits)),
         IntToHex(int64(nonce)),
-    }, []byte{})
+    }, []byte{},)
 
     return data
 }

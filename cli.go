@@ -5,6 +5,8 @@ import (
     "os"
     "fmt"
     "strconv"
+    "log"
+    "time"
 )
 
 const (
@@ -16,7 +18,24 @@ type CLI struct {
     blockChain *BlockChain
 }
 
+func (cli *CLI) PrintUsage() {
+    fmt.Println("cli <command> [option]")
+    fmt.Println("commands:")
+    fmt.Println("   " + printChain + ": print the block chain")
+    fmt.Println("   " + addBlock + " -data <block name> : add the block to the block chain")
+    fmt.Println("")
+}
+
+func (cli *CLI) ValidateArgs() {
+    if len(os.Args) < 2 {
+        cli.PrintUsage()
+        os.Exit(1)
+    }
+}
+
 func (cli *CLI) Run() {
+    cli.ValidateArgs()
+
     addBlockCmd := flag.NewFlagSet(addBlock, flag.ExitOnError)
     printChainCmd := flag.NewFlagSet(printChain, flag.ExitOnError)
 
@@ -24,7 +43,10 @@ func (cli *CLI) Run() {
 
     switch os.Args[1] {
     case addBlock:
-        addBlockCmd.Parse(os.Args[2:])
+        err := addBlockCmd.Parse(os.Args[2:])
+        if err != nil {
+            log.Panic(err)
+        }
     case printChain:
         printChainCmd.Parse(os.Args[2:])
     default:
@@ -83,12 +105,4 @@ func (cli *CLI) PrintChain() {
             break
         }
     }
-}
-
-func (cli *CLI) PrintUsage() {
-    fmt.Println("cli <command> [option]")
-    fmt.Println("commands:")
-    fmt.Println("   " + printChain + ": print the block chain")
-    fmt.Println("   " + addBlock + " -data <block name> : add the block to the block chain")
-    fmt.Println("")
 }

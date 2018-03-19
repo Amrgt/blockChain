@@ -4,14 +4,15 @@ import (
     "time"
     "bytes"
     "encoding/gob"
+    "log"
 )
 
 type Block struct {
-    Timestamp int64
-    Data []byte
+    Timestamp    int64
+    Data         []byte
     PreviousHash []byte
-    Hash []byte
-    Nonce int
+    Hash         []byte
+    Nonce        int
 }
 
 func NewBlock(data string, previousBlockHash []byte) *Block {
@@ -31,16 +32,20 @@ func GenesisBlock() *Block {
 func (block *Block) Serialize() []byte {
     var serialized bytes.Buffer
     encoder := gob.NewEncoder(&serialized)
-    encoder.Encode(block)
+    err := encoder.Encode(block)
+    if err != nil {
+        log.Panic(err)
+    }
+
     return serialized.Bytes()
 }
 
 func DeserializeBlock(serialized []byte) *Block {
     var block Block
     decoder := gob.NewDecoder(bytes.NewReader(serialized))
-    decoder.Decode(&block)
-    if len(block.PreviousHash) == 0 {
-        block.PreviousHash = []byte{}
+    err := decoder.Decode(&block)
+    if err != nil {
+        log.Panic(err)
     }
     return &block
 }
