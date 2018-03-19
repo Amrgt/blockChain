@@ -5,18 +5,19 @@ import (
     "bytes"
     "encoding/gob"
     "log"
+    "crypto/sha256"
 )
 
 type Block struct {
     Timestamp    int64
-    Data         []byte
+    Transactions []*Transaction
     PreviousHash []byte
     Hash         []byte
     Nonce        int
 }
 
-func NewBlock(data string, previousBlockHash []byte) *Block {
-    block := &Block{time.Now().Unix(), []byte(data), previousBlockHash, []byte{}, 0}
+func NewBlock(transactions []*Transaction, previousBlockHash []byte) *Block {
+    block := &Block{time.Now().Unix(), transactions, previousBlockHash, []byte{}, 0}
     proofOfWork := NewProofOfWork(block)
     nonce, hash := proofOfWork.Work()
     block.Nonce = nonce
@@ -25,8 +26,8 @@ func NewBlock(data string, previousBlockHash []byte) *Block {
     return block
 }
 
-func GenesisBlock() *Block {
-    return NewBlock("Genesis Block", []byte{})
+func GenesisBlock(transaction *Transaction) *Block {
+    return NewBlock([]*Transaction{transaction}, []byte{})
 }
 
 func (block *Block) Serialize() []byte {
@@ -48,4 +49,16 @@ func DeserializeBlock(serialized []byte) *Block {
         log.Panic(err)
     }
     return &block
+}
+
+func(block *Block) HashTransactions() []byte {
+    var txHashes [][]byte
+    var txHash [32]byte
+
+    for _, tx := range block.Transactions {
+        txHashes = append(txHashes, tx.ID)
+    }
+    txHash = sha256.Sum256(bytes.Join(txHashes, []byte{}))
+
+    return txHash[:]
 }

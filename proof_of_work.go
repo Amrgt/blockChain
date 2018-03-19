@@ -10,7 +10,7 @@ import (
     "log"
 )
 
-const minBits = 24
+const minBits = 18
 const maxNonce = math.MaxInt64
 
 type ProofOfWork struct {
@@ -29,7 +29,7 @@ func NewProofOfWork(block *Block) *ProofOfWork {
 func (proofOfWork *ProofOfWork) OrganizeData(nonce int) []byte {
     data := bytes.Join([][]byte{
         proofOfWork.block.PreviousHash,
-        proofOfWork.block.Data,
+        proofOfWork.block.HashTransactions(),
         IntToHex(proofOfWork.block.Timestamp),
         IntToHex(int64(minBits)),
         IntToHex(int64(nonce)),
@@ -43,7 +43,7 @@ func (proofOfWork *ProofOfWork) Work() (int, []byte) {
     var hash [32]byte
     nonce := 0
 
-    fmt.Printf("Mining the block: \"%s\"\n", proofOfWork.block.Data)
+    fmt.Printf("Mining the new block")
 
     for nonce < maxNonce  {
         data := proofOfWork.OrganizeData(nonce)

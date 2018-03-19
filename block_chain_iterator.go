@@ -3,7 +3,6 @@ package main
 import (
     "github.com/boltdb/bolt"
     "log"
-    "fmt"
 )
 
 type BlockChainIterator struct {
